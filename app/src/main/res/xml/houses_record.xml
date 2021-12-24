@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<houses>
+    <record year="2000" elevator="1" entrance="1" heating="Центральное"/>
+    <record year="2002" elevator="2" entrance="4" heating="Центральное"/>
+    <record year="2010" elevator="1" entrance="3" heating="Центральное"/>
+    <record year="1998" elevator="1" entrance="1" heating="Центральное"/>
+    <record year="2008" elevator="1" entrance="1" heating="Индивидуальное"/>
+    <record year="2003" elevator="2" entrance="4" heating="Центральное"/>
+    <record year="2005" elevator="1" entrance="1" heating="Центральное"/>
+    <record year="2009" elevator="1" entrance="2" heating="Центральное"/>
+    <record year="2012" elevator="2" entrance="1" heating="Центральное"/>
+    <record year="2019" elevator="1" entrance="1" heating="Центральное"/>
+    <record year="2018" elevator="1" entrance="3" heating="Центральное"/>
+    <record year="2020" elevator="2" entrance="5" heating="Центральное"/>
+</houses>

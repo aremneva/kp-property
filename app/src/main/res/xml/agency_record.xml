@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<agency>
+    <record name_agency="Домовой" description="Более 25 лет осуществляет полный спектр услуг на рынке первичной, вторичной и коммерческой недвижимости, загородного жилья и аренды." year = "2012" phone="7944623784" site="domovoi.com"/>
+    <record name_agency="Новая жизнь" description="Двигаем недвижимое" year = "2002" phone="7954743257" site="newlfe.ru"/>
+    <record name_agency="Домбург" description="Наша главная задача — выгодные и безопасные сделки с недвижимостью" year = "2000" phone="7944623784" site="domburg.com"/>
+    <record name_agency="Квартал" description="Более 25 ы." year = "2011" phone="7944623784" site="kvartal.com"/>
+    <record name_agency="Альфа дом" description="Профессиональный сервис по сопровождению сделок с недвижимостью" year = "2007" phone="7944823784" site="aphdom.com"/>
+    <record name_agency="Новодом" description="Большая база готовых домов" year = "2020" phone="7944923784" site="newdom.com"/>
+    <record name_agency="Мир недвижимости" description="Помогаем в оформлении сделок с недвижимостью" year = "2008" phone="7954623784" site="mirnedv.com"/>
+    <record name_agency="Новострой" description="Агентство недвижимости, которому можно доверять" year = "2010" phone="7944623864" site="novosrtoi.com"/>
+    <record name_agency="Результат" description="Профессиональный сервис по сопровождению сделок с недвижимостью" year = "2013" phone="7944623894" site="resdom.com"/>
+    <record name_agency="Выбор" description="Большая база готовых домов" year = "2015" phone="7944623454" site="vibor.com"/>
+    <record name_agency="Великий город" description="Профессиональный сервис по сопровождению сделок с недвижимостью" year = "2013" phone="7976623784" site="velkiygorod.com"/>
+    <record name_agency="Ваш очаг" description="Агентство недвижимости, которому можно доверять!" year = "2017" phone="7944983784" site="vashochag.com"/>
+
+</agency>
