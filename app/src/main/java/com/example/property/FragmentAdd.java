@@ -41,8 +41,8 @@ public class FragmentAdd extends Fragment {
     Uri selectedImageUri;
     public static final int PICK_IMAGE = 1;
 
-
     ImageView imgProp;
+
     public FragmentAdd() {
 
     }
@@ -57,14 +57,9 @@ public class FragmentAdd extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
-
     }
+
     public void Post(View v){
-
-
 
     }
 
@@ -97,11 +92,15 @@ public class FragmentAdd extends Fragment {
                 String tPrice = ePrice.getEditText().getText().toString();
 
 
-               String tImage = selectedImageUri.toString(); //тут
+
+               String tImage = selectedImageUri.toString(); //добавление в бд недвижимости и картинки
+                //ДОДЕЛАТЬ ТУТ
+                Log.d("PICTURE","pic: "+tImage+ " drw: "+imgProp.getDrawable());
                 try {
 
                     DBHelper db = new DBHelper(v.getContext());
                     db.addProperty(tDesc, tAddress, tPrice, "later", tArea, tRooms, tFloor, 0, 0, 0);
+                    db.addImageToProperty(tImage,db.getIdPropertyByAddress(tAddress),null);
                 }
                 catch (Exception e){
                     Log.d("MAIN",e.getMessage(),e);
@@ -150,7 +149,8 @@ public class FragmentAdd extends Fragment {
                     }
                 }
             });
-    public void pickImage() {
+
+    public void pickImage() { //Выбор картинки из галлереи
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         someActivityResultLauncher.launch(intent);

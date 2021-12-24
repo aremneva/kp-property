@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 public class PropertyAdapter extends
@@ -29,7 +31,11 @@ public class PropertyAdapter extends
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     Property property = mProperty.get(position);
-    holder.img.setImageResource(property.getImage());
+
+        Picasso.with(holder.itemView.getContext())
+                .load(property.getImage())
+                .into(holder.img);
+   // holder.img.setImageResource(property.getImage()); старое
     }
 
     public PropertyAdapter(List<Property> properties) {

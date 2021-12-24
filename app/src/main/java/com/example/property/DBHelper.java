@@ -19,9 +19,14 @@ import com.squareup.picasso.Picasso;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.util.ArrayList;
+
 
 public class DBHelper extends SQLiteOpenHelper {
     private Context context;
+
+    public static final String LOG_TAG="MAIN";
+
     public  static final String DATABASE_NAME="Property.dp";
     public static final int DATABASE_VERSION=1;
     public static final String TABLE_PROPERTY="property";
@@ -140,7 +145,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String createImgProperty="CREATE TABLE "+TABLE_IMG_PROPERTY+" ("
                 +COLUMN_ID_IMG_PROPERTY+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 +COLUMN_ID_PROPERTY+ " INTEGER NOT NULL, "
-                +COLUMN_IMAGE_PROPERTY+ " BLOB, "
+                +COLUMN_IMAGE_PROPERTY+ " VARCHAR, "
                 +COLUMN_DESCRIPTION_IMAGE+ " VARCHAR, " +
                 "FOREIGN KEY ( "+COLUMN_ID_PROPERTY+" ) REFERENCES "+TABLE_PROPERTY+"( "+COLUMN_ID_PROPERTY+" ));";
         db.execSQL(createImgProperty);
@@ -159,8 +164,11 @@ public class DBHelper extends SQLiteOpenHelper {
         Resources res_houses = context.getResources();
         Resources res_agency=context.getResources();
 
+
+        //Загрузка данных из XML в таблицы агенства и дома
         XmlResourceParser _xml_agency=res_agency.getXml(R.xml.agency_record);
         XmlResourceParser _xml_houses=res_agency.getXml(R.xml.houses_record);
+
         try{
             int enTypeAgency = _xml_agency.getEventType();
             while (enTypeAgency!= XmlPullParser.END_DOCUMENT){
@@ -201,7 +209,7 @@ public class DBHelper extends SQLiteOpenHelper {
             //https://drive.google.com/file/d/1RWzPqF5yuO0zXdvka8-iT_Jp60K6APqQ/view?usp=sharing
         }
         catch(Exception e){
-         Log.d("MAIN",e.getMessage(),e);
+         Log.d(LOG_TAG,e.getMessage(),e);
         }
         finally {
             _xml_agency.close();
@@ -223,7 +231,39 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    void addUser(String login, String password, String email){
+    void getAllFromProperty(ArrayList<Property> arrayList){ //Получение всех записей для вывода
+    //ДОДЕЛЫВАТЬ ТУТ
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM "+TABLE_PROPERTY+" ;";
+
+        SQLiteDatabase db2 = this.getWritableDatabase();
+        String query2 = "SELECT * FROM "+TABLE_IMG_PROPERTY+" ;"; //Тут сделать по-другому, в зависимости от прошлого запроса?
+
+        Cursor c=db.rawQuery(query,null);
+        Cursor c2=db.rawQuery(query2,null);
+
+        c.moveToFirst();
+        c2.moveToFirst();
+
+        do {
+            // что-то страшное
+            arrayList.add(new Property(c.getColumnIndex(COLUMN_ID_PROPERTY),
+                    c.getString(c.getColumnIndex(COLUMN_ADDRESS)),
+                    c.getDouble(c.getColumnIndex(COLUMN_PRICE)),
+                    c.getString(c.getColumnIndex(COLUMN_METRO)),
+                    c.getDouble(c.getColumnIndex(COLUMN_AREA)),
+                    c.getInt(c.getColumnIndex(COLUMN_ROOMS)),
+                    c.getInt(c.getColumnIndex(COLUMN_FLOOR)),
+                    c.getInt(c.getColumnIndex(COLUMN_ID_USER)),
+                    c.getInt(c.getColumnIndex(COLUMN_ID_AGENCY)),
+                    c.getInt(c.getColumnIndex(COLUMN_ID_HOUSE)),
+                    c2.getString(c2.getColumnIndex(COLUMN_IMAGE_PROPERTY)),
+                    c2.getString(c2.getColumnIndex(COLUMN_DESCRIPTION_IMAGE))));
+        } while (c.moveToNext()&&c2.moveToNext());
+
+    }
+
+    void addUser(String login, String password, String email){ //Добавление пользователя
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -232,13 +272,14 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_EMAIL,email);
 
         long res2 = db.insert(TABLE_USER,null,cv);
-        if ((res2==-1)){
+        if ((res2==-1)){    //Проверка на добавление пользователя
             Toast.makeText(context,"Failed",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(context,"Success",Toast.LENGTH_SHORT).show();
         }
     }
-    void addHouse(String year,String elevator, String entrance,String heating){
+
+    void addHouse(String year,String elevator, String entrance,String heating){ //Добавление дома
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv1 = new ContentValues();
         cv1.put(COLUMN_YEAR,year);
@@ -246,30 +287,30 @@ public class DBHelper extends SQLiteOpenHelper {
         cv1.put(COLUMN_ENTRANCE,entrance);
         cv1.put(COLUMN_HEATING,heating);
         long res = db.insert(TABLE_HOUSE,null,cv1);
-        if (res==-1){
-            Toast.makeText(context,"Failed",Toast.LENGTH_SHORT).show();
-        }
+        checkOnFail(res);
     }
-    int getCountUser(String login){
+
+    int getCountUser(String login){ //Количество пользователей с заданным логином
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM "+TABLE_USER+" WHERE "+COLUMN_LOGIN+" = '"+login+"' ;";
         Cursor c2=db.rawQuery(query,null);
         int count=c2.getCount();
         return count;
     }
-    void getUser(String login){
+
+    void getUser(String login){ //Получение пользователя по логину
         SQLiteDatabase db = this.getWritableDatabase();
         try{
         String query = "SELECT * FROM "+TABLE_USER+" WHERE "+COLUMN_LOGIN+" = '"+login+"' ;";
         Cursor c2=db.rawQuery(query,null);
         c2.moveToFirst();
-        Log.d("MAIN","count: "+c2.getCount()+" c2:  login "+c2.getColumnIndex(COLUMN_LOGIN)+" pas: "+c2.getColumnIndex(COLUMN_PASSWORD));
+        Log.d(LOG_TAG,"count: "+c2.getCount()+" c2:  login "+c2.getColumnIndex(COLUMN_LOGIN)+" pas: "+c2.getColumnIndex(COLUMN_PASSWORD));
         }catch (Exception e){
-            Log.d("MAIN","Exception: "+ e);
+            Log.d(LOG_TAG,"Exception: "+ e);
         }
     }
 
-    boolean againstPassword(String login,String password){
+    boolean againstPassword(String login,String password){ //Проверка корректности введенного пароля
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM "+TABLE_USER+" WHERE "+COLUMN_LOGIN+" = '"+login+"' ;";
         Cursor c2=db.rawQuery(query,null);
@@ -282,7 +323,8 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
     }
-    void addProperty(String desc,String address, String price,String metro, String area, String rooms, String floor, int id_user,int id_agency, int id_house){
+
+    void addProperty(String desc,String address, String price,String metro, String area, String rooms, String floor, int id_user,int id_agency, int id_house){ //Добавление недвижимости
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv1 = new ContentValues();
         cv1.put(COLUMN_PROPERTY_DESCRIPTION,desc);
@@ -295,13 +337,38 @@ public class DBHelper extends SQLiteOpenHelper {
         cv1.put(COLUMN_ID_AGENCY,id_agency);
         cv1.put(COLUMN_ID_HOUSE,id_house);
         long res = db.insert(TABLE_PROPERTY,null,cv1);
-        if (res==-1){
+        checkOnFail(res);
+
+    }
+
+    void addImageToProperty(String image, int id_property,String desc){ //Добавление изображения
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv1 = new ContentValues();
+        cv1.put(COLUMN_IMAGE_PROPERTY,image);
+        cv1.put(COLUMN_DESCRIPTION_IMAGE,desc);
+        cv1.put(COLUMN_ID_PROPERTY,id_property);
+
+        long res = db.insert(TABLE_IMG_PROPERTY,null,cv1);
+        checkOnFail(res);
+    }
+
+    void checkOnFail(long result){ //Успешно ли добавлены данные
+        if (result==-1){
             Toast.makeText(context,"Failed",Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public long addImage(String url, String id_property)
+    int getIdPropertyByAddress(String address){ //ID недвижимости по ее адресу
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM "+TABLE_PROPERTY+" WHERE "+COLUMN_ADDRESS+" = '"+address+"' ;";
+        Cursor c2=db.rawQuery(query,null);
+        c2.moveToFirst();
+        Log.d(LOG_TAG,"ID_PROPERTY: "+ c2.getInt(c2.getColumnIndex(COLUMN_ID_PROPERTY)));
+        return c2.getInt(c2.getColumnIndex(COLUMN_ID_PROPERTY));
+    }
+
+    public long addImage(String url, String id_property)  //Что-то старое
     {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -318,7 +385,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return 0;
     }
 
-    public void setImage(ImageView view, String path,String id_property){
+    public void setImage(ImageView view, String path,String id_property){ //Это тоже старое
         SQLiteDatabase db = this.getWritableDatabase();
 
         String query = "SELECT * FROM "+TABLE_IMG_PROPERTY+" WHERE "+COLUMN_ID_PROPERTY+" = '"+id_property+"' ;";

@@ -38,7 +38,7 @@ RecyclerView rec;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        properties=Property.setInitialData(1);
+        properties=Property.setInitialData(1, getContext());
         rec = (RecyclerView) view.findViewById(R.id.recMain);
         rec.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
