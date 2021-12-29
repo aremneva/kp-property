@@ -35,6 +35,7 @@ public class PropertyAdapter extends
         Picasso.with(holder.itemView.getContext())
                 .load(property.getImage())
                 .into(holder.img);
+        holder.price.setText(property.getPrice()+"$");
    // holder.img.setImageResource(property.getImage()); старое
     }
 
@@ -50,10 +51,12 @@ public class PropertyAdapter extends
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView img;
+        public TextView price;
 
         public ViewHolder(View itemView) {
             super(itemView);
             img = (ImageView) itemView.findViewById(R.id.img_property);
+            price = (TextView) itemView.findViewById(R.id.txt_propertyPrice);
 
         }
     }

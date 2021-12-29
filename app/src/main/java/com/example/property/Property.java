@@ -3,6 +3,7 @@ package com.example.property;
 import android.content.ContentValues;
 import android.content.Context;
 import android.provider.SyncStateContract;
+import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +24,8 @@ public class Property {
     private String image;
     private String desc_image;
 
+
+    public static final String LOG_TAG="MAIN";
     public Property(int id_property,  String address, double price, String metro, double area, int rooms, int floor, int id_user, int id_agency, int id_house, String image, String desc_image) {
         this.id_property = id_property;
         this.address = address;
@@ -72,8 +75,12 @@ public class Property {
        // prop.add(new Property(R.drawable.kv3));
        // prop.add(new Property(R.drawable.kv4));
        // prop.add(new Property(R.drawable.kv5));
-        db.getAllFromProperty(prop);
-
+        try {
+            db.getAllFromProperty(prop);
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG,e.getMessage());
+        }
         return prop;
     }
 

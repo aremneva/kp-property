@@ -19,12 +19,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
+
+import java.security.SecurityPermission;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -38,10 +46,16 @@ public class FragmentAdd extends Fragment {
     TextInputLayout eFloor;
     TextInputLayout ePrice;
 
+    Spinner lAgencies;
+
+    ArrayList<Agency> agencies = new ArrayList<Agency>();
+
     Uri selectedImageUri;
     public static final int PICK_IMAGE = 1;
-
+    public static final String LOG_TAG="MAIN";
     ImageView imgProp;
+
+    int id_agency;
 
     public FragmentAdd() {
 
@@ -91,19 +105,26 @@ public class FragmentAdd extends Fragment {
                 String tFloor = eFloor.getEditText().getText().toString();
                 String tPrice = ePrice.getEditText().getText().toString();
 
+              //  final int[] idAgency = new int[1];
 
 
-               String tImage = selectedImageUri.toString(); //добавление в бд недвижимости и картинки
+               Uri tImage = selectedImageUri; //добавление в бд недвижимости и картинки
+               // String tImage = imgProp.getDrawable().toString();
+                if((tDesc.equals("")) || (tAddress.equals("")) || (tArea.equals("")) || (tRooms.equals("")) || (tFloor.equals("")) || (tPrice.equals(""))||(id_agency==-1) ){
+                    Toast.makeText(getContext(),"Заполните все поля!",Toast.LENGTH_SHORT).show();
+                }
+                else{
                 //ДОДЕЛАТЬ ТУТ
+
                 Log.d("PICTURE","pic: "+tImage+ " drw: "+imgProp.getDrawable());
                 try {
-
                     DBHelper db = new DBHelper(v.getContext());
-                    db.addProperty(tDesc, tAddress, tPrice, "later", tArea, tRooms, tFloor, 0, 0, 0);
+                    db.addProperty(tDesc, tAddress, tPrice, "later", tArea, tRooms, tFloor, 0, id_agency, 0);
                     db.addImageToProperty(tImage,db.getIdPropertyByAddress(tAddress),null);
                 }
                 catch (Exception e){
                     Log.d("MAIN",e.getMessage(),e);
+                }
                 }
             }
         });
@@ -119,9 +140,44 @@ public class FragmentAdd extends Fragment {
         eRooms= (TextInputLayout) getView().findViewById(R.id.textRooms);
         eFloor= (TextInputLayout) getView().findViewById(R.id.textFloor);
         ePrice= (TextInputLayout) getView().findViewById(R.id.textIPrice);
+        lAgencies=(Spinner) getView().findViewById(R.id.listAgency);
+
+        DBHelper db = new DBHelper(getContext());
+
+        ArrayList<String> names= new ArrayList<String>();
+        db.getAgency(agencies);
+        for (int i =0; i<agencies.size();i++){
+            try {
+            names.add(agencies.get(i).getName());
+        }catch (Exception e){
+                Log.d(LOG_TAG,"Error ag: "+e.getMessage());
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item,names);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lAgencies.setAdapter(adapter);
+
+
+        lAgencies.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(LOG_TAG, "selected agency:  "+agencies.get(position).getId_agency());
+                //idAgency[0] = agencies.get(position).getId_agency();
+                id_agency=agencies.get(position).getId_agency();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.d(LOG_TAG, "null");
+                id_agency=-1;
+                // idAgency[0]=-1;
+            }
+        });
+
 
         imgProp = (ImageView) getView().findViewById(R.id.imageProp);
         imgProp.setClickable(true);
+
         imgProp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

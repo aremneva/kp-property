@@ -7,6 +7,10 @@ import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.provider.SyncStateContract;
 import android.util.Log;
 import android.widget.ImageView;
@@ -19,6 +23,11 @@ import com.squareup.picasso.Picasso;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 
 
@@ -233,33 +242,35 @@ public class DBHelper extends SQLiteOpenHelper {
 
     void getAllFromProperty(ArrayList<Property> arrayList){ //Получение всех записей для вывода
     //ДОДЕЛЫВАТЬ ТУТ
+        try {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM "+TABLE_PROPERTY+" ;";
-
-        SQLiteDatabase db2 = this.getWritableDatabase();
-        String query2 = "SELECT * FROM "+TABLE_IMG_PROPERTY+" ;"; //Тут сделать по-другому, в зависимости от прошлого запроса?
+        String query = "SELECT * FROM "+TABLE_PROPERTY+" INNER JOIN "+TABLE_IMG_PROPERTY +" ON "+TABLE_PROPERTY+"."+COLUMN_ID_PROPERTY+" = "+TABLE_IMG_PROPERTY+"."+COLUMN_ID_PROPERTY+" ;";
 
         Cursor c=db.rawQuery(query,null);
-        Cursor c2=db.rawQuery(query2,null);
+
 
         c.moveToFirst();
-        c2.moveToFirst();
 
-        do {
-            // что-то страшное
-            arrayList.add(new Property(c.getColumnIndex(COLUMN_ID_PROPERTY),
-                    c.getString(c.getColumnIndex(COLUMN_ADDRESS)),
-                    c.getDouble(c.getColumnIndex(COLUMN_PRICE)),
-                    c.getString(c.getColumnIndex(COLUMN_METRO)),
-                    c.getDouble(c.getColumnIndex(COLUMN_AREA)),
-                    c.getInt(c.getColumnIndex(COLUMN_ROOMS)),
-                    c.getInt(c.getColumnIndex(COLUMN_FLOOR)),
-                    c.getInt(c.getColumnIndex(COLUMN_ID_USER)),
-                    c.getInt(c.getColumnIndex(COLUMN_ID_AGENCY)),
-                    c.getInt(c.getColumnIndex(COLUMN_ID_HOUSE)),
-                    c2.getString(c2.getColumnIndex(COLUMN_IMAGE_PROPERTY)),
-                    c2.getString(c2.getColumnIndex(COLUMN_DESCRIPTION_IMAGE))));
-        } while (c.moveToNext()&&c2.moveToNext());
+
+            do {
+                // что-то страшное
+                arrayList.add(new Property(c.getColumnIndex(COLUMN_ID_PROPERTY),
+                        c.getString(c.getColumnIndex(COLUMN_ADDRESS)),
+                        c.getDouble(c.getColumnIndex(COLUMN_PRICE)),
+                        c.getString(c.getColumnIndex(COLUMN_METRO)),
+                        c.getDouble(c.getColumnIndex(COLUMN_AREA)),
+                        c.getInt(c.getColumnIndex(COLUMN_ROOMS)),
+                        c.getInt(c.getColumnIndex(COLUMN_FLOOR)),
+                        c.getInt(c.getColumnIndex(COLUMN_ID_USER)),
+                        c.getInt(c.getColumnIndex(COLUMN_ID_AGENCY)),
+                        c.getInt(c.getColumnIndex(COLUMN_ID_HOUSE)),
+                        c.getString(c.getColumnIndex(COLUMN_IMAGE_PROPERTY)),
+                        c.getString(c.getColumnIndex(COLUMN_DESCRIPTION_IMAGE))));
+            } while (c.moveToNext());
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG,"Error: "+e.getMessage());
+        }
 
     }
 
@@ -341,10 +352,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    void addImageToProperty(String image, int id_property,String desc){ //Добавление изображения
+    void addImageToProperty(Uri image, int id_property, String desc){ //Добавление изображения
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv1 = new ContentValues();
-        cv1.put(COLUMN_IMAGE_PROPERTY,image);
+        cv1.put(COLUMN_IMAGE_PROPERTY,getImageUrlWithAuthority(context,image));
         cv1.put(COLUMN_DESCRIPTION_IMAGE,desc);
         cv1.put(COLUMN_ID_PROPERTY,id_property);
 
@@ -366,6 +377,22 @@ public class DBHelper extends SQLiteOpenHelper {
         c2.moveToFirst();
         Log.d(LOG_TAG,"ID_PROPERTY: "+ c2.getInt(c2.getColumnIndex(COLUMN_ID_PROPERTY)));
         return c2.getInt(c2.getColumnIndex(COLUMN_ID_PROPERTY));
+    }
+
+    ArrayList<Agency> getAgency(ArrayList<Agency> agencies){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query="SELECT * FROM "+TABLE_AGENCY+" ;";
+        Cursor c =db.rawQuery(query,null);
+        c.moveToFirst();
+        do{
+            agencies.add(new Agency(c.getInt(c.getColumnIndex(COLUMN_ID_AGENCY)),
+                    c.getString(c.getColumnIndex(COLUMN_NAME_AGENCY)),
+                    c.getString(c.getColumnIndex(COLUMN_DESCRIPTION_AGENCY)),
+                    c.getInt(c.getColumnIndex(COLUMN_YEAR_AGENCY)),
+                    c.getString(c.getColumnIndex(COLUMN_PHONE_AGENCY)),
+                    c.getString(c.getColumnIndex(COLUMN_SITE_AGENCY))));
+        }while (c.moveToNext());
+        return agencies;
     }
 
     public long addImage(String url, String id_property)  //Что-то старое
@@ -399,5 +426,46 @@ public class DBHelper extends SQLiteOpenHelper {
                 .into(view);
 
         c2.close();
+    }
+
+    private static String getImageUrlWithAuthority(Context context, Uri uri)
+    {
+        InputStream is = null;
+
+        if (uri.getAuthority() != null)
+        {
+            try
+            {
+                is = context.getContentResolver().openInputStream(uri);
+                Bitmap bmp = BitmapFactory.decodeStream(is);
+                return writeToTempImageAndGetPathUri(context, bmp).toString();
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                try
+                {
+                    if (is != null)
+                    {
+                        is.close();
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+    private static Uri writeToTempImageAndGetPathUri(Context inContext, Bitmap inImage)
+    {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 }
