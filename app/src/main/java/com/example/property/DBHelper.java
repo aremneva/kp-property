@@ -241,19 +241,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     void getAllFromProperty(ArrayList<Property> arrayList){ //Получение всех записей для вывода
-    //ДОДЕЛЫВАТЬ ТУТ
         try {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM "+TABLE_PROPERTY+" INNER JOIN "+TABLE_IMG_PROPERTY +" ON "+TABLE_PROPERTY+"."+COLUMN_ID_PROPERTY+" = "+TABLE_IMG_PROPERTY+"."+COLUMN_ID_PROPERTY+" ;";
-
         Cursor c=db.rawQuery(query,null);
-
-
         c.moveToFirst();
-
-
             do {
-                // что-то страшное
                 arrayList.add(new Property(c.getColumnIndex(COLUMN_ID_PROPERTY),
                         c.getString(c.getColumnIndex(COLUMN_ADDRESS)),
                         c.getDouble(c.getColumnIndex(COLUMN_PRICE)),
@@ -273,6 +266,23 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
     }
+    void getFavProperty(ArrayList<Favorite> arrayList){ //Получение всех записей для вывода
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            String query = "SELECT * FROM "+TABLE_USERS_FAV+" WHERE "+COLUMN_ID_USER+" = "+ 0 ;
+            Cursor c=db.rawQuery(query,null);
+            c.moveToFirst();
+            do {
+                arrayList.add(new Favorite(
+                        c.getInt(c.getColumnIndex(COLUMN_ID_PROPERTY))));
+            } while (c.moveToNext());
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG,"Error: "+e.getMessage());
+        }
+
+    }
+
 
     void addUser(String login, String password, String email){ //Добавление пользователя
         SQLiteDatabase db = this.getWritableDatabase();
@@ -412,6 +422,22 @@ public class DBHelper extends SQLiteOpenHelper {
         return 0;
     }
 
+    public long addFav(int id_property)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues cv=new ContentValues();
+            cv.put(COLUMN_ID_PROPERTY,id_property);
+            cv.put(COLUMN_ID_USER,0);
+            db.insert(TABLE_USERS_FAV,null,cv);
+
+            return 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
     public void setImage(ImageView view, String path,String id_property){ //Это тоже старое
         SQLiteDatabase db = this.getWritableDatabase();
 

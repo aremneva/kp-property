@@ -82,16 +82,6 @@ public class FragmentAdd extends Fragment {
                              Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.fragment_add, container, false);
-       // ImageView imgProp = (ImageView) getView().findViewById(R.id.imageProp);
-       // imgProp.setClickable(true);
-       // imgProp.setOnClickListener(new View.OnClickListener() {
-       //     @Override
-       //     public void onClick(View v) {
-       //         Toast.makeText(v.getContext(),
-       //                 "OK",
-       //                 Toast.LENGTH_LONG).show();
-       //     }
-       // });
 
         Button button = (Button)  view.findViewById(R.id.post);
         button.setOnClickListener(new View.OnClickListener() {
@@ -101,25 +91,21 @@ public class FragmentAdd extends Fragment {
                 String tDesc = eDesc.getEditText().getText().toString();
                 String tAddress = eAddress.getEditText().getText().toString();
                 String tArea = eArea.getEditText().getText().toString();
-                String tRooms = eRooms.getEditText().getText().toString();
                 String tFloor = eFloor.getEditText().getText().toString();
+                String tRooms = eRooms.getEditText().getText().toString();
                 String tPrice = ePrice.getEditText().getText().toString();
-
-              //  final int[] idAgency = new int[1];
 
 
                Uri tImage = selectedImageUri; //добавление в бд недвижимости и картинки
-               // String tImage = imgProp.getDrawable().toString();
                 if((tDesc.equals("")) || (tAddress.equals("")) || (tArea.equals("")) || (tRooms.equals("")) || (tFloor.equals("")) || (tPrice.equals(""))||(id_agency==-1) ){
                     Toast.makeText(getContext(),"Заполните все поля!",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                //ДОДЕЛАТЬ ТУТ
-
                 Log.d("PICTURE","pic: "+tImage+ " drw: "+imgProp.getDrawable());
                 try {
                     DBHelper db = new DBHelper(v.getContext());
                     db.addProperty(tDesc, tAddress, tPrice, "later", tArea, tRooms, tFloor, 0, id_agency, 0);
+                    Log.d("MAIN","rooms: "+tRooms);
                     db.addImageToProperty(tImage,db.getIdPropertyByAddress(tAddress),null);
                 }
                 catch (Exception e){
@@ -162,7 +148,6 @@ public class FragmentAdd extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(LOG_TAG, "selected agency:  "+agencies.get(position).getId_agency());
-                //idAgency[0] = agencies.get(position).getId_agency();
                 id_agency=agencies.get(position).getId_agency();
             }
 
@@ -170,7 +155,6 @@ public class FragmentAdd extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
                 Log.d(LOG_TAG, "null");
                 id_agency=-1;
-                // idAgency[0]=-1;
             }
         });
 
@@ -185,7 +169,6 @@ public class FragmentAdd extends Fragment {
                 Log.d("MAIN", "click!");
             }
         });
-
     }
 
     ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
@@ -211,7 +194,5 @@ public class FragmentAdd extends Fragment {
         intent.setType("image/*");
         someActivityResultLauncher.launch(intent);
     }
-
-
 
 }

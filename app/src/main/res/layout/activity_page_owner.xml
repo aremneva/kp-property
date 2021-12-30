@@ -41,7 +41,7 @@
         android:id="@+id/frameLayout4"
         android:layout_width="349dp"
         android:layout_height="177dp"
-        android:layout_marginBottom="184dp"
+        android:layout_marginBottom="128dp"
 
         android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"

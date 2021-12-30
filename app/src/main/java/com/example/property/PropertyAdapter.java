@@ -1,6 +1,7 @@
 package com.example.property;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class PropertyAdapter extends
@@ -31,12 +33,23 @@ public class PropertyAdapter extends
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
     Property property = mProperty.get(position);
-
+    Context context =holder.itemView.getContext();
         Picasso.with(holder.itemView.getContext())
                 .load(property.getImage())
                 .into(holder.img);
         holder.price.setText(property.getPrice()+"$");
    // holder.img.setImageResource(property.getImage()); старое
+
+    holder.itemView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(context,page_property.class);
+            intent.putExtra("price",holder.price.getText());
+            intent.putExtra("img",holder.img.getDrawable().toString());
+            intent.putExtra("obj", (Serializable) mProperty.get(position));
+            holder.itemView.getContext().startActivity(intent);
+        }
+    });
     }
 
     public PropertyAdapter(List<Property> properties) {

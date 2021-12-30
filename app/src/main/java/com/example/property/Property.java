@@ -1,15 +1,12 @@
 package com.example.property;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.provider.SyncStateContract;
 import android.util.Log;
 
-import com.squareup.picasso.Picasso;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Property {
+public class Property implements Serializable {
     private int id_property;
     private String address;
     private double price;
@@ -38,6 +35,78 @@ public class Property {
         this.id_agency = id_agency;
         this.id_house = id_house;
         this.image = image;
+        this.desc_image = desc_image;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getMetro() {
+        return metro;
+    }
+
+    public void setMetro(String metro) {
+        this.metro = metro;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public void setArea(double area) {
+        this.area = area;
+    }
+
+    public int getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(int rooms) {
+        this.rooms = rooms;
+    }
+
+    public int getFloor() {
+        return floor;
+    }
+
+    public void setFloor(int floor) {
+        this.floor = floor;
+    }
+
+    public int getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(int id_user) {
+        this.id_user = id_user;
+    }
+
+    public int getId_agency() {
+        return id_agency;
+    }
+
+    public void setId_agency(int id_agency) {
+        this.id_agency = id_agency;
+    }
+
+    public int getId_house() {
+        return id_house;
+    }
+
+    public void setId_house(int id_house) {
+        this.id_house = id_house;
+    }
+
+    public String getDesc_image() {
+        return desc_image;
+    }
+
+    public void setDesc_image(String desc_image) {
         this.desc_image = desc_image;
     }
 
@@ -70,11 +139,6 @@ public class Property {
     public static ArrayList<Property> setInitialData(int num, Context context) {
         DBHelper db = new DBHelper(context);
         ArrayList<Property> prop = new ArrayList<Property>();
-       // prop.add(new Property(R.drawable.kv1));
-       // prop.add(new Property(R.drawable.kv2));
-       // prop.add(new Property(R.drawable.kv3));
-       // prop.add(new Property(R.drawable.kv4));
-       // prop.add(new Property(R.drawable.kv5));
         try {
             db.getAllFromProperty(prop);
         }
@@ -84,7 +148,13 @@ public class Property {
         return prop;
     }
 
+    public int getId_property() {
+        return id_property;
+    }
 
+    public void setId_property(int id_property) {
+        this.id_property = id_property;
+    }
 
     public  static ArrayList<Property> setDataFinal(int num){
         ArrayList<Property> prop = new ArrayList<Property>();
@@ -92,9 +162,4 @@ public class Property {
         return prop;
 
     }
-
-
-
-
-
 }
